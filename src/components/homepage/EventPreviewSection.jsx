@@ -31,7 +31,7 @@ const EventPreviewSection = () => {
           setError("Failed to load events");
         } else {
           // Get first 3 events
-          setEvents(response.data.slice(0, 3));
+          setEvents((response.data.events || []).slice(0, 3));
         }
       } catch (err) {
         setError("Failed to load events");
