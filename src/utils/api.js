@@ -484,6 +484,33 @@ async function deleteEvent(id) {
   }
 }
 
+// TEKNIK-MU1 , tampilkan peserta event
+async function getEventParticipants(eventId) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/${eventId}/participants`
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, data: [], message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data || [] };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      data: [],
+      message:
+        "An unexpected error occurred while fetching event participants. Please try again.",
+    };
+  }
+}
+
 export {
   getAccessToken,
   putAccessToken,
@@ -509,4 +536,5 @@ export {
   getEventById,
   updateEvent,
   deleteEvent,
+  getEventParticipants,
 };
