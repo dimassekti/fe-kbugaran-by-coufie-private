@@ -511,6 +511,202 @@ async function getEventParticipants(eventId) {
   }
 }
 
+async function addEventParticipant(eventId, { userId, role }) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/${eventId}/participants`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, role }),
+      }
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while adding event participant. Please try again.",
+    };
+  }
+}
+
+async function getParticipantById(participantId) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/participants/${participantId}`
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data.participant };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while fetching participant details. Please try again.",
+    };
+  }
+}
+
+async function getParticipantMedicalStatus(eventId, userId) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/${eventId}/checkups/${userId}`
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while fetching medical status. Please try again.",
+    };
+  }
+}
+
+async function createParticipantCheckup(eventId, checkupData) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/${eventId}/checkups`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(checkupData),
+      }
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while creating checkup. Please try again.",
+    };
+  }
+}
+
+async function updateParticipantCheckup(eventId, userId, checkupData) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/${eventId}/checkups/${userId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(checkupData),
+      }
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while updating checkup. Please try again.",
+    };
+  }
+}
+
+async function getAllUsers() {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/users`);
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, data: [], message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data || [] };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      data: [],
+      message:
+        "An unexpected error occurred while fetching users. Please try again.",
+    };
+  }
+}
+
+async function getUserByUsername(username) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/users/username/${encodeURIComponent(username)}`
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, data: null, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data.user };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      data: null,
+      message:
+        "An unexpected error occurred while fetching user by username. Please try again.",
+    };
+  }
+}
+
 export {
   getAccessToken,
   putAccessToken,
@@ -537,4 +733,11 @@ export {
   updateEvent,
   deleteEvent,
   getEventParticipants,
+  addEventParticipant,
+  getParticipantById,
+  getParticipantMedicalStatus,
+  createParticipantCheckup,
+  updateParticipantCheckup,
+  getAllUsers,
+  getUserByUsername,
 };

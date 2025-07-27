@@ -5,16 +5,29 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import { useNavigate } from "react-router-dom";
 
-function ParticipantTable({ participants }) {
+function ParticipantTable({ participants, emptyMessage }) {
   const navigate = useNavigate();
 
+  // Add number column based on registration order
+  const participantsWithNumbers = participants.map((participant, index) => ({
+    ...participant,
+    number: index + 1,
+  }));
+
   const columns = [
-    { field: "name", headerName: "Nama", flex: 1 },
-    { field: "dob", headerName: "Tanggal Lahir", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "phone", headerName: "Telepon", flex: 1 },
-    { field: "registrationDate", headerName: "Tanggal Registrasi", flex: 1 },
-    { field: "checkUpStatus", headerName: "Status Check-up", flex: 1 },
+    { field: "number", headerName: "No", width: 70 },
+    { field: "username", headerName: "Username", flex: 1 },
+    { field: "role", headerName: "Role", flex: 1 },
+    {
+      field: "registration_date",
+      headerName: "Tanggal Registrasi",
+      flex: 1,
+      valueFormatter: (params) => {
+        if (!params.value) return "-";
+        return new Date(params.value).toLocaleDateString("id-ID");
+      },
+    },
+    { field: "status", headerName: "Status", flex: 1 },
     {
       field: "actions",
       headerName: "Aksi",
@@ -34,7 +47,7 @@ function ParticipantTable({ participants }) {
   return (
     <Box sx={{ height: 400, width: "100%", mt: 2 }}>
       <DataGrid
-        rows={participants}
+        rows={participantsWithNumbers}
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5, 10, 20]}
@@ -42,6 +55,9 @@ function ParticipantTable({ participants }) {
         disableSelectionOnClick
         autoHeight
         sx={{ backgroundColor: "white" }}
+        localeText={{
+          noRowsLabel: emptyMessage || "No participants available",
+        }}
       />
     </Box>
   );
@@ -49,6 +65,7 @@ function ParticipantTable({ participants }) {
 
 ParticipantTable.propTypes = {
   participants: PropTypes.array.isRequired,
+  emptyMessage: PropTypes.string,
 };
 
 export default ParticipantTable;

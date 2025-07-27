@@ -11,18 +11,47 @@ import FormControl from "@mui/material/FormControl";
 
 const categories = ["Seminar", "Workshop", "Kompetisi", "Meetup", "Webinar"];
 
+// Helper function to format date for input field (YYYY-MM-DD)
+function formatDateForInput(dateStr) {
+  if (!dateStr) return "";
+
+  // Handle both ISO format (2025-01-15T00:00:00.000Z) and simple date (2025-01-15)
+  const date = new Date(dateStr);
+
+  // Check if date is valid
+  if (isNaN(date.getTime())) return "";
+
+  // Return in YYYY-MM-DD format for date input
+  return date.toISOString().split("T")[0];
+}
+
 class EventInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       name: props.event?.name || "",
       description: props.event?.description || "",
-      date: props.event?.date || "",
+      date: formatDateForInput(props.event?.date) || "",
       location: props.event?.location || "",
       organizer: props.event?.organizer || "",
       capacity: props.event?.capacity || "",
       category: props.event?.category || "",
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    // Update state when event prop changes (important for edit mode)
+    if (prevProps.event !== this.props.event && this.props.event) {
+      this.setState({
+        name: this.props.event.name || "",
+        description: this.props.event.description || "",
+        date: formatDateForInput(this.props.event.date) || "",
+        location: this.props.event.location || "",
+        organizer: this.props.event.organizer || "",
+        capacity: this.props.event.capacity || "",
+        category: this.props.event.category || "",
+      });
+    }
   }
 
   handleChange = (e) => {

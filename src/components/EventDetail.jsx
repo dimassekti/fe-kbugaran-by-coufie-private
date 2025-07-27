@@ -26,6 +26,7 @@ function EventDetail({
   onEdit,
   onDelete,
   onBack,
+  onAddParticipant,
   error,
 }) {
   const navigate = useNavigate();
@@ -109,6 +110,12 @@ function EventDetail({
           </Button>
           <Button
             variant="contained"
+            color="success"
+            onClick={onAddParticipant}>
+            Tambah Peserta
+          </Button>
+          <Button
+            variant="contained"
             color="primary"
             onClick={() => navigate(`/events/${event.id}/participants`)}>
             View Participants
@@ -130,6 +137,7 @@ EventDetail.propTypes = {
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
   onBack: PropTypes.func,
+  onAddParticipant: PropTypes.func,
   error: PropTypes.string,
 };
 
