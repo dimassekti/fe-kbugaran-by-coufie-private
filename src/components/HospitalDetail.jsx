@@ -7,40 +7,24 @@ import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
-import { useNavigate } from "react-router-dom";
 
-function formatDate(dateStr) {
-  if (!dateStr) return "-";
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return "-";
-  return date.toLocaleDateString("id-ID", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-function EventDetail({
-  event,
-  participantCount,
-  medicalStaffCount,
+function HospitalDetail({
+  hospital,
+  staffCount,
   onEdit,
   onDelete,
   onBack,
-  onAddParticipant,
-  onAddMedicalStaff,
+  onAddStaff,
   error,
 }) {
-  const navigate = useNavigate();
-
-  if (!event) {
+  if (!hospital) {
     return (
       <Card sx={{ maxWidth: 600, mx: "auto", mt: 3 }}>
         <CardContent>
           <Alert
             severity="error"
             sx={{ mb: 2 }}>
-            Event tidak ditemukan.
+            Rumah sakit tidak ditemukan.
           </Alert>
           <Button
             variant="outlined"
@@ -67,37 +51,31 @@ function EventDetail({
           spacing={1}
           alignItems="center"
           sx={{ mb: 2 }}>
-          <Typography variant="h5">{event.name || "-"}</Typography>
+          <Typography variant="h5">{hospital.name || "-"}</Typography>
           <Chip
-            label={event.category || "-"}
+            label={hospital.type === "hospital" ? "Rumah Sakit" : "Klinik"}
             color="primary"
           />
         </Stack>
         <Typography
           variant="body1"
           sx={{ mb: 2 }}>
-          {event.description || "-"}
+          {hospital.description || "-"}
         </Typography>
         <Typography variant="body2">
-          Tanggal: {formatDate(event.date)}
-        </Typography>
-        <Typography variant="body2">Lokasi: {event.location || "-"}</Typography>
-        <Typography variant="body2">
-          Penyelenggara: {event.organizer || "-"}
+          Alamat: {hospital.address || "-"}
         </Typography>
         <Typography variant="body2">
-          Participants:{" "}
-          {participantCount !== undefined ? participantCount : "-"}/
-          {event.capacity !== undefined && event.capacity !== null
-            ? event.capacity
-            : "-"}
+          Telepon: {hospital.phone || "-"}
+        </Typography>
+        {hospital.email && (
+          <Typography variant="body2">Email: {hospital.email}</Typography>
+        )}
+        <Typography variant="body2">
+          Jumlah Staff: {staffCount !== undefined ? staffCount : "-"}
         </Typography>
         <Typography variant="body2">
-          Medical Staff:{" "}
-          {medicalStaffCount !== undefined ? medicalStaffCount : "-"}
-        </Typography>
-        <Typography variant="body2">
-          Status: {event.status || "Aktif"}
+          Status: {hospital.isActive ? "Aktif" : "Tidak Aktif"}
         </Typography>
         <Stack
           direction="row"
@@ -117,20 +95,8 @@ function EventDetail({
           <Button
             variant="contained"
             color="success"
-            onClick={onAddParticipant}>
-            Tambah Peserta
-          </Button>
-          <Button
-            variant="contained"
-            color="info"
-            onClick={onAddMedicalStaff}>
-            Tambah Medical Staff
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate(`/events/${event.id}/participants`)}>
-            View Participants
+            onClick={onAddStaff}>
+            Tambah Staff
           </Button>
           <Button
             variant="outlined"
@@ -143,16 +109,14 @@ function EventDetail({
   );
 }
 
-EventDetail.propTypes = {
-  event: PropTypes.object,
-  participantCount: PropTypes.number,
-  medicalStaffCount: PropTypes.number,
+HospitalDetail.propTypes = {
+  hospital: PropTypes.object,
+  staffCount: PropTypes.number,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
   onBack: PropTypes.func,
-  onAddParticipant: PropTypes.func,
-  onAddMedicalStaff: PropTypes.func,
+  onAddStaff: PropTypes.func,
   error: PropTypes.string,
 };
 
-export default EventDetail;
+export default HospitalDetail;

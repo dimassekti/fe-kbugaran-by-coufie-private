@@ -7,10 +7,16 @@ import {
   addEventParticipant,
   getAllUsers,
   getUserByUsername,
+  getEventMedicalStaff,
+  addEventMedicalStaff,
+  deleteEventMedicalStaff,
+  getAvailableStaffForEvent,
 } from "../utils/api";
 import EventDetail from "../components/EventDetail";
 import ParticipantTable from "../components/ParticipantTable";
 import AddParticipantDialog from "../components/AddParticipantDialog";
+import EventMedicalStaffTable from "../components/EventMedicalStaffTable";
+import AddEventMedicalStaffDialog from "../components/AddEventMedicalStaffDialog";
 import { Snackbar, Alert, Box } from "@mui/material";
 
 /* 
@@ -74,11 +80,17 @@ function EventDetailPage() {
   const [event, setEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [participantCount, setParticipantCount] = useState(0);
+  const [medicalStaff, setMedicalStaff] = useState([]);
+  const [medicalStaffCount, setMedicalStaffCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showAddMedicalStaffDialog, setShowAddMedicalStaffDialog] =
+    useState(false);
   const [users, setUsers] = useState([]);
+  const [availableStaff, setAvailableStaff] = useState([]);
   const [addingParticipant, setAddingParticipant] = useState(false);
+  const [addingMedicalStaff, setAddingMedicalStaff] = useState(false);
 
   // VALIDATION PATTERN: Separate Error States
   // ==========================================
@@ -130,6 +142,21 @@ function EventDetailPage() {
           console.log("Participants data:", participantsData); // Debug log
           setParticipants(participantsData);
           setParticipantCount(participantsData.length);
+        }
+
+        // Fetch medical staff
+        const medicalStaffResponse = await getEventMedicalStaff(id);
+        if (medicalStaffResponse.error) {
+          console.warn(
+            "Failed to fetch medical staff:",
+            medicalStaffResponse.message
+          );
+          setMedicalStaff([]);
+          setMedicalStaffCount(0);
+        } else {
+          const medicalStaffData = medicalStaffResponse.data || [];
+          setMedicalStaff(medicalStaffData);
+          setMedicalStaffCount(medicalStaffData.length);
         }
       } catch (err) {
         setError("Terjadi kesalahan saat memuat data event");
@@ -257,6 +284,92 @@ function EventDetailPage() {
     }
   };
 
+  // Medical Staff Handlers
+  const handleAddMedicalStaff = async () => {
+    setShowAddMedicalStaffDialog(true);
+    // Try to fetch available staff for event
+    try {
+      const staffResponse = await getAvailableStaffForEvent(id);
+      if (!staffResponse.error) {
+        setAvailableStaff(staffResponse.data);
+      }
+    } catch (err) {
+      console.warn("Failed to fetch available staff:", err);
+      setAvailableStaff([]);
+    }
+  };
+
+  const handleCloseAddMedicalStaffDialog = () => {
+    setShowAddMedicalStaffDialog(false);
+    setAvailableStaff([]);
+    setDialogError(null);
+  };
+
+  const handleSubmitMedicalStaff = async (staffData) => {
+    setAddingMedicalStaff(true);
+    setDialogError(null);
+
+    try {
+      const response = await addEventMedicalStaff(id, staffData);
+
+      if (response.error) {
+        if (response.message.includes("sudah ditugaskan")) {
+          setDialogError("This staff member is already assigned to this event");
+        } else {
+          setDialogError("Failed to add medical staff: " + response.message);
+        }
+        return;
+      }
+
+      setSuccessMessage("Medical staff added successfully!");
+      setShowAddMedicalStaffDialog(false);
+      setAvailableStaff([]);
+      setDialogError(null);
+
+      // Refresh medical staff data
+      const medicalStaffResponse = await getEventMedicalStaff(id);
+      if (!medicalStaffResponse.error) {
+        const medicalStaffData = medicalStaffResponse.data || [];
+        setMedicalStaff(medicalStaffData);
+        setMedicalStaffCount(medicalStaffData.length);
+      }
+    } catch (err) {
+      setError("An unexpected error occurred while adding medical staff");
+      console.error("Error adding medical staff:", err);
+    } finally {
+      setAddingMedicalStaff(false);
+    }
+  };
+
+  const handleDeleteMedicalStaff = async (staffId) => {
+    try {
+      const response = await deleteEventMedicalStaff(staffId);
+      if (response.error) {
+        setError("Gagal menghapus medical staff: " + response.message);
+        return;
+      }
+
+      setSuccessMessage("Medical staff deleted successfully!");
+
+      // Refresh medical staff data
+      const medicalStaffResponse = await getEventMedicalStaff(id);
+      if (!medicalStaffResponse.error) {
+        const medicalStaffData = medicalStaffResponse.data || [];
+        setMedicalStaff(medicalStaffData);
+        setMedicalStaffCount(medicalStaffData.length);
+      }
+    } catch (err) {
+      setError("Terjadi kesalahan saat menghapus medical staff");
+      console.error("Error deleting medical staff:", err);
+    }
+  };
+
+  const handleEditMedicalStaff = (staffId) => {
+    // For now, just show an alert. In a full implementation,
+    // this would open an edit dialog similar to the add dialog
+    alert("Edit medical staff functionality not implemented yet");
+  };
+
   const handleCloseSnackbar = () => {
     setSuccessMessage("");
   };
@@ -274,10 +387,12 @@ function EventDetailPage() {
       <EventDetail
         event={event}
         participantCount={participantCount}
+        medicalStaffCount={medicalStaffCount}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onBack={handleBack}
         onAddParticipant={handleAddParticipant}
+        onAddMedicalStaff={handleAddMedicalStaff}
         error={error}
       />
 
@@ -291,6 +406,12 @@ function EventDetailPage() {
           />
         )}
       </Box>
+
+      <EventMedicalStaffTable
+        medicalStaff={medicalStaff}
+        onEdit={handleEditMedicalStaff}
+        onDelete={handleDeleteMedicalStaff}
+      />
 
       {/* VALIDATION PATTERN: Dialog Component Integration
           ===============================================
@@ -308,6 +429,16 @@ function EventDetailPage() {
         loading={addingParticipant}
         error={dialogError}
         participants={participants}
+      />
+
+      <AddEventMedicalStaffDialog
+        open={showAddMedicalStaffDialog}
+        onClose={handleCloseAddMedicalStaffDialog}
+        onSubmit={handleSubmitMedicalStaff}
+        availableStaff={availableStaff}
+        loading={addingMedicalStaff}
+        error={dialogError}
+        currentMedicalStaff={medicalStaff}
       />
 
       <Snackbar

@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { FiHome, FiPlus, FiLogOut } from "react-icons/fi";
 
-function PageNavigation({ logout, name }) {
-  console.log("PageNavigation props:", { logout, name });
+function PageNavigation({ logout, name, userRole }) {
+  console.log("PageNavigation props:", { logout, name, userRole });
 
   return (
     <nav className="navigation">
@@ -13,14 +13,16 @@ function PageNavigation({ logout, name }) {
           <Link to="/">Home</Link>
         </li>
         <li>
-          <Link to="/add">Add</Link>
+          <Link to="/hospitals">Hospitals</Link>
         </li>
         <li>
           <Link to="/events">Event</Link>
         </li>
-        <li>
-          <Link to="/events/add">Tambah Event</Link>
-        </li>
+        {userRole === "admin" && (
+          <li>
+            <Link to="/users">Users</Link>
+          </li>
+        )}
         {logout && (
           <li>
             <button
@@ -38,6 +40,7 @@ function PageNavigation({ logout, name }) {
 PageNavigation.propTypes = {
   logout: PropTypes.func.isRequired,
   name: PropTypes.string,
+  userRole: PropTypes.string,
 };
 
 export default PageNavigation;

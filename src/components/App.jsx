@@ -14,6 +14,11 @@ import ParticipantListPage from "../pages/ParticipantListPage";
 import EventParticipantsPage from "../pages/EventParticipantsPage";
 import ParticipantDetailPage from "../pages/ParticipantDetailPage";
 import ParticipantCheckUpPage from "../pages/ParticipantCheckUpPage";
+import HospitalsPage from "../pages/HospitalsPage";
+import AddHospitalPage from "../pages/AddHospitalPage";
+import HospitalDetailPage from "../pages/HospitalDetailPage";
+import EditHospitalPage from "../pages/EditHospitalPage";
+import UsersPage from "../pages/UsersPage";
 import { getUserLogged, putAccessToken, logout } from "../utils/api";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import ToggleTheme from "./ToggleTheme";
@@ -55,6 +60,7 @@ class App extends React.Component {
 
     const { data } = await getUserLogged();
     console.log("getUserLogged result:", { data });
+    console.log("User role:", data?.user?.role);
     this.setState(() => {
       return {
         authedUser: data,
@@ -67,6 +73,7 @@ class App extends React.Component {
     putAccessToken(accessToken);
     const { data } = await getUserLogged();
     console.log("onLoginSuccess getUserLogged result:", { data });
+    console.log("User role:", data?.user?.role);
     this.setState(() => {
       return {
         authedUser: data,
@@ -138,6 +145,7 @@ class App extends React.Component {
                 this.state.authedUser.user?.username ||
                 "User"
               }
+              userRole={this.state.authedUser.user?.role}
             />
             <ToggleTheme />
           </header>
@@ -148,8 +156,24 @@ class App extends React.Component {
                 element={<HomePage />}
               />
               <Route
-                path="/add"
-                element={<AddPage />}
+                path="/hospitals"
+                element={<HospitalsPage />}
+              />
+              <Route
+                path="/hospitals/add"
+                element={<AddHospitalPage />}
+              />
+              <Route
+                path="/hospitals/:id"
+                element={<HospitalDetailPage />}
+              />
+              <Route
+                path="/hospitals/:id/edit"
+                element={<EditHospitalPage />}
+              />
+              <Route
+                path="/users"
+                element={<UsersPage />}
               />
               <Route
                 path="/notes/:id"

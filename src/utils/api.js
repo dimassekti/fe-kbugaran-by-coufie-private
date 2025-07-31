@@ -1,5 +1,29 @@
 const BASE_URL = "http://localhost:5000";
 
+// Error categorization helper
+function categorizeAPIError(status, message) {
+  // Categorize errors based on HTTP status codes and message content
+  if (status >= 400 && status < 500) {
+    if (status === 401) return "warning";
+    if (status === 403) return "warning";
+    if (status === 404) return "info";
+    if (
+      status === 409 ||
+      message?.includes("already exists") ||
+      message?.includes("unique") ||
+      message?.includes("constraint")
+    )
+      return "warning";
+    return "error"; // Other 4xx errors (like validation errors)
+  }
+
+  if (status >= 500) {
+    return "error"; // Server errors
+  }
+
+  return "error"; // Default to error for unknown cases
+}
+
 function getAccessToken() {
   return localStorage.getItem("accessToken");
 }
@@ -707,6 +731,524 @@ async function getUserByUsername(username) {
   }
 }
 
+// Hospital API functions
+async function getHospitals() {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/hospitals`);
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      // Enhanced error categorization
+      const errorType = categorizeAPIError(
+        response.status,
+        responseJson.message
+      );
+      return {
+        error: true,
+        data: [],
+        message: responseJson.message,
+        type: errorType,
+      };
+    }
+
+    // Backend returns data.hospitals, but frontend expects data to be the array
+    const hospitalsArray =
+      responseJson.data?.hospitals || responseJson.data || [];
+    return { error: false, data: hospitalsArray };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      data: [],
+      message:
+        "An unexpected error occurred while fetching hospitals. Please try again.",
+      type: "error",
+    };
+  }
+}
+
+async function getHospitalById(id) {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/hospitals/${id}`);
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      const errorType = categorizeAPIError(
+        response.status,
+        responseJson.message
+      );
+      return {
+        error: true,
+        data: null,
+        message: responseJson.message,
+        type: errorType,
+      };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      data: null,
+      message:
+        "An unexpected error occurred while fetching hospital. Please try again.",
+      type: "error",
+    };
+  }
+}
+
+async function addHospital(payload) {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/hospitals`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      const errorType = categorizeAPIError(
+        response.status,
+        responseJson.message
+      );
+
+      // Enhanced error message for validation or constraint violations
+      let enhancedMessage = responseJson.message;
+      if (
+        response.status === 409 ||
+        responseJson.message.includes("already exists") ||
+        responseJson.message.includes("unique")
+      ) {
+        enhancedMessage = `A hospital with this information already exists. Please check the name and try again.`;
+      } else if (response.status === 400) {
+        enhancedMessage = `Please check your input: ${responseJson.message}`;
+      }
+
+      return {
+        error: true,
+        message: enhancedMessage,
+        type: errorType,
+      };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while adding hospital. Please try again.",
+      type: "error",
+    };
+  }
+}
+
+async function updateHospital(id, payload) {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/hospitals/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      const errorType = categorizeAPIError(
+        response.status,
+        responseJson.message
+      );
+
+      // Enhanced error message for validation or constraint violations
+      let enhancedMessage = responseJson.message;
+      if (
+        response.status === 409 ||
+        responseJson.message.includes("already exists") ||
+        responseJson.message.includes("unique")
+      ) {
+        enhancedMessage = `A hospital with this information already exists. Please check the name and try again.`;
+      } else if (response.status === 400) {
+        enhancedMessage = `Please check your input: ${responseJson.message}`;
+      } else if (response.status === 404) {
+        enhancedMessage = `Hospital not found. It may have been deleted by another user.`;
+      }
+
+      return {
+        error: true,
+        message: enhancedMessage,
+        type: errorType,
+      };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while updating hospital. Please try again.",
+      type: "error",
+    };
+  }
+}
+
+async function deleteHospital(id) {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/hospitals/${id}`, {
+      method: "DELETE",
+    });
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      const errorType = categorizeAPIError(
+        response.status,
+        responseJson.message
+      );
+
+      // Enhanced error message for deletion scenarios
+      let enhancedMessage = responseJson.message;
+      if (response.status === 404) {
+        enhancedMessage = `Hospital not found. It may have already been deleted.`;
+      } else if (
+        response.status === 409 ||
+        responseJson.message.includes("constraint") ||
+        responseJson.message.includes("reference")
+      ) {
+        enhancedMessage = `Cannot delete hospital as it has associated data (staff, events, etc.). Please remove all related data first.`;
+      } else if (response.status === 403) {
+        enhancedMessage = `You don't have permission to delete this hospital.`;
+      }
+
+      return {
+        error: true,
+        message: enhancedMessage,
+        type: errorType,
+      };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while deleting hospital. Please try again.",
+      type: "error",
+    };
+  }
+}
+
+async function getHospitalStaff(hospitalId) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/hospitals/${hospitalId}/staff`
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, data: [], message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data || [] };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      data: [],
+      message:
+        "An unexpected error occurred while fetching hospital staff. Please try again.",
+    };
+  }
+}
+
+async function addHospitalStaff(hospitalId, payload) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/hospitals/${hospitalId}/staff`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while adding hospital staff. Please try again.",
+    };
+  }
+}
+
+async function updateHospitalStaff(staffId, payload) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/hospitals/staff/${staffId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while updating hospital staff. Please try again.",
+    };
+  }
+}
+
+async function deleteHospitalStaff(staffId) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/hospitals/staff/${staffId}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while deleting hospital staff. Please try again.",
+    };
+  }
+}
+
+async function getEventMedicalStaff(eventId) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/${eventId}/medical-staff`
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, data: [], message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data || [] };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      data: [],
+      message:
+        "An unexpected error occurred while fetching event medical staff. Please try again.",
+    };
+  }
+}
+
+async function addEventMedicalStaff(eventId, payload) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/${eventId}/medical-staff`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while adding event medical staff. Please try again.",
+    };
+  }
+}
+
+async function deleteEventMedicalStaff(staffId) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/medical-staff/${staffId}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while deleting event medical staff. Please try again.",
+    };
+  }
+}
+
+async function getAvailableStaffForEvent(eventId) {
+  try {
+    const response = await fetchWithToken(
+      `${BASE_URL}/events/${eventId}/available-staff`
+    );
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      return { error: true, data: [], message: responseJson.message };
+    }
+
+    return { error: false, data: responseJson.data || [] };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      data: [],
+      message:
+        "An unexpected error occurred while fetching available staff. Please try again.",
+    };
+  }
+}
+
+async function addUserByAdmin(payload) {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      const errorType = categorizeAPIError(
+        response.status,
+        responseJson.message
+      );
+
+      // Enhanced error message for validation or constraint violations
+      let enhancedMessage = responseJson.message;
+      if (
+        response.status === 409 ||
+        responseJson.message.includes("already exists") ||
+        responseJson.message.includes("unique")
+      ) {
+        enhancedMessage = `A user with this username already exists. Please choose a different username.`;
+      } else if (response.status === 400) {
+        enhancedMessage = `Please check your input: ${responseJson.message}`;
+      } else if (response.status === 403) {
+        enhancedMessage = `You don't have permission to create users with this role.`;
+      }
+
+      return {
+        error: true,
+        message: enhancedMessage,
+        type: errorType,
+      };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while adding user. Please try again.",
+      type: "error",
+    };
+  }
+}
+
 export {
   getAccessToken,
   putAccessToken,
@@ -740,4 +1282,18 @@ export {
   updateParticipantCheckup,
   getAllUsers,
   getUserByUsername,
+  getHospitals,
+  getHospitalById,
+  addHospital,
+  updateHospital,
+  deleteHospital,
+  getHospitalStaff,
+  addHospitalStaff,
+  updateHospitalStaff,
+  deleteHospitalStaff,
+  getEventMedicalStaff,
+  addEventMedicalStaff,
+  deleteEventMedicalStaff,
+  getAvailableStaffForEvent,
+  addUserByAdmin,
 };
