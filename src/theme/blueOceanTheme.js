@@ -17,7 +17,7 @@ const blueOceanTheme = (mode) =>
         contrastText: "#ffffff",
       },
       background: {
-        default: mode === "light" ? "#f5f9ff" : "#0a1929",
+        default: mode === "light" ? "#e3f2fd" : "#0a1929",
         paper: mode === "light" ? "#ffffff" : "#1e293b",
       },
       text: {

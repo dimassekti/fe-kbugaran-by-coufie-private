@@ -402,7 +402,10 @@ async function getEvents() {
       return { error: true, data: null, message: responseJson.message };
     }
 
-    return { error: false, data: responseJson.data };
+    return {
+      error: false,
+      data: responseJson.data.events || responseJson.data || [],
+    };
   } catch (error) {
     if (error.name === "TypeError" || error.message.includes("fetch")) {
       return showConnectionError();
@@ -690,7 +693,7 @@ async function getAllUsers() {
       return { error: true, data: [], message: responseJson.message };
     }
 
-    return { error: false, data: responseJson.data || [] };
+    return { error: false, data: responseJson.data.users || [] };
   } catch (error) {
     if (error.name === "TypeError" || error.message.includes("fetch")) {
       return showConnectionError();
@@ -971,7 +974,7 @@ async function getHospitalStaff(hospitalId) {
       return { error: true, data: [], message: responseJson.message };
     }
 
-    return { error: false, data: responseJson.data || [] };
+    return { error: false, data: responseJson.data.staff || [] };
   } catch (error) {
     if (error.name === "TypeError" || error.message.includes("fetch")) {
       return showConnectionError();
@@ -1092,7 +1095,7 @@ async function getEventMedicalStaff(eventId) {
       return { error: true, data: [], message: responseJson.message };
     }
 
-    return { error: false, data: responseJson.data || [] };
+    return { error: false, data: responseJson.data.medicalStaff || [] };
   } catch (error) {
     if (error.name === "TypeError" || error.message.includes("fetch")) {
       return showConnectionError();
@@ -1180,7 +1183,7 @@ async function getAvailableStaffForEvent(eventId) {
       return { error: true, data: [], message: responseJson.message };
     }
 
-    return { error: false, data: responseJson.data || [] };
+    return { error: false, data: responseJson.data.availableStaff || [] };
   } catch (error) {
     if (error.name === "TypeError" || error.message.includes("fetch")) {
       return showConnectionError();
@@ -1249,6 +1252,113 @@ async function addUserByAdmin(payload) {
   }
 }
 
+async function updateUser(userId, payload) {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/users/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseJson = await response.json();
+
+    if (responseJson.status !== "success") {
+      const errorType = categorizeAPIError(
+        response.status,
+        responseJson.message
+      );
+
+      // Enhanced error message for validation or constraint violations
+      let enhancedMessage = responseJson.message;
+      if (
+        response.status === 409 ||
+        responseJson.message.includes("already exists") ||
+        responseJson.message.includes("unique")
+      ) {
+        enhancedMessage = `A user with this username already exists. Please choose a different username.`;
+      } else if (response.status === 400) {
+        enhancedMessage = `Please check your input: ${responseJson.message}`;
+      } else if (response.status === 404) {
+        enhancedMessage = `User not found.`;
+      } else if (response.status === 403) {
+        enhancedMessage = `You don't have permission to update this user.`;
+      }
+
+      return {
+        error: true,
+        message: enhancedMessage,
+        type: errorType,
+      };
+    }
+
+    return { error: false, data: responseJson.data };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while updating user. Please try again.",
+      type: "error",
+    };
+  }
+}
+
+async function deleteUser(userId) {
+  try {
+    const response = await fetchWithToken(`${BASE_URL}/users/${userId}`, {
+      method: "DELETE",
+    });
+
+    const responseJson = await response.json();
+
+    if (
+      responseJson.status !== "success" &&
+      responseJson.status !== "disabled"
+    ) {
+      const errorType = categorizeAPIError(
+        response.status,
+        responseJson.message
+      );
+
+      // Enhanced error message for different scenarios
+      let enhancedMessage = responseJson.message;
+      if (response.status === 404) {
+        enhancedMessage = `User not found.`;
+      } else if (response.status === 403) {
+        enhancedMessage = `You don't have permission to delete this user.`;
+      }
+
+      return {
+        error: true,
+        message: enhancedMessage,
+        type: errorType,
+      };
+    }
+
+    return {
+      error: false,
+      data: responseJson.data,
+      status: responseJson.status,
+    };
+  } catch (error) {
+    if (error.name === "TypeError" || error.message.includes("fetch")) {
+      return showConnectionError();
+    }
+
+    return {
+      error: true,
+      message:
+        "An unexpected error occurred while deleting user. Please try again.",
+      type: "error",
+    };
+  }
+}
+
 export {
   getAccessToken,
   putAccessToken,
@@ -1282,6 +1392,8 @@ export {
   updateParticipantCheckup,
   getAllUsers,
   getUserByUsername,
+  updateUser,
+  deleteUser,
   getHospitals,
   getHospitalById,
   addHospital,

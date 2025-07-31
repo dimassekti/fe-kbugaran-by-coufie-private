@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import PageNavigation from "./PageNavigation";
 import HomePage from "../pages/HomePage";
+import AboutPage from "../pages/AboutPage";
 import AddPage from "../pages/AddPage";
 import DetailPage from "../pages/DetailPage";
 import RegisterPage from "../pages/RegisterPage";
@@ -109,24 +110,24 @@ class App extends React.Component {
             <main>
               <Routes>
                 <Route
-                  path="/events/:eventId/participants"
-                  element={<EventParticipantsPage />}
+                  path="/"
+                  element={<HomePage />}
                 />
                 <Route
-                  path="/participants/:participantId"
-                  element={<ParticipantDetailPage />}
-                />
-                <Route
-                  path="/participants/:participantId/checkup"
-                  element={<ParticipantCheckUpPage />}
-                />
-                <Route
-                  path="/*"
-                  element={<LoginPage loginSuccess={this.onLoginSuccess} />}
+                  path="/about"
+                  element={<AboutPage />}
                 />
                 <Route
                   path="/register"
                   element={<RegisterPage />}
+                />
+                <Route
+                  path="/login"
+                  element={<LoginPage loginSuccess={this.onLoginSuccess} />}
+                />
+                <Route
+                  path="/*"
+                  element={<LoginPage loginSuccess={this.onLoginSuccess} />}
                 />
               </Routes>
             </main>
@@ -154,6 +155,10 @@ class App extends React.Component {
               <Route
                 path="/"
                 element={<HomePage />}
+              />
+              <Route
+                path="/about"
+                element={<AboutPage />}
               />
               <Route
                 path="/hospitals"

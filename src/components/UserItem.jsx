@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
 
-function UserItem({ user, onDelete, onEdit }) {
+function UserItem({ user, onDelete, onEdit, deleteDisabled = true }) {
   const getRoleColor = (role) => {
     switch (role) {
       case "admin":
@@ -67,7 +67,12 @@ function UserItem({ user, onDelete, onEdit }) {
           size="small"
           color="error"
           onClick={() => onDelete && onDelete(user.id)}
-          disabled={!onDelete}>
+          disabled={deleteDisabled || !onDelete}
+          title={
+            deleteDisabled
+              ? "Delete functionality is currently disabled for safety"
+              : ""
+          }>
           Delete
         </Button>
       </CardActions>
@@ -84,6 +89,7 @@ UserItem.propTypes = {
   }).isRequired,
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
+  deleteDisabled: PropTypes.bool,
 };
 
 export default UserItem;

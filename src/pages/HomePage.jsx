@@ -6,7 +6,6 @@ import {
   HeroCarousel,
   EventPreviewSection,
   BenefitsSection,
-  ContactSection,
 } from "../components/homepage";
 
 const HomePage = () => {
@@ -24,9 +23,6 @@ const HomePage = () => {
 
         {/* Benefits Section */}
         <BenefitsSection />
-
-        {/* Contact Section */}
-        <ContactSection />
       </Box>
     </ThemeProvider>
   );

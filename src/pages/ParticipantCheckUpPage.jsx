@@ -99,11 +99,15 @@ function ParticipantCheckUpPage() {
       let response;
 
       if (medicalData) {
-        // Edit mode - update existing checkup
+        // Edit mode - update existing checkup with userId included
+        const updatePayload = {
+          ...checkupData,
+          userId: participant.user_id,
+        };
         response = await updateParticipantCheckup(
           participant.event_id,
           participant.user_id,
-          checkupData
+          updatePayload
         );
       } else {
         // Create mode - create new checkup

@@ -258,6 +258,7 @@ function HospitalDetailPage() {
         users={users}
         loading={addingStaff}
         error={dialogError}
+        staff={staff}
       />
 
       <Snackbar

@@ -27,7 +27,7 @@ function AddEventMedicalStaffDialog({
   currentMedicalStaff,
 }) {
   const [formData, setFormData] = useState({
-    staffId: "",
+    hospitalStaffId: "",
     assignmentRole: "",
     notes: "",
   });
@@ -39,7 +39,7 @@ function AddEventMedicalStaffDialog({
   useEffect(() => {
     if (open) {
       setFormData({
-        staffId: "",
+        hospitalStaffId: "",
         assignmentRole: "",
         notes: "",
       });
@@ -55,7 +55,7 @@ function AddEventMedicalStaffDialog({
   }, [error]);
 
   const handleChange = (field) => (event, value) => {
-    if (field === "staffId" && value) {
+    if (field === "hospitalStaffId" && value) {
       // Handle Autocomplete component
       setFormData({
         ...formData,
@@ -79,7 +79,7 @@ function AddEventMedicalStaffDialog({
     setFormError("");
 
     // Required field validation
-    if (!formData.staffId) {
+    if (!formData.hospitalStaffId) {
       setFormError("Staff selection is required");
       return;
     }
@@ -92,7 +92,7 @@ function AddEventMedicalStaffDialog({
     // Check for duplicates in current medical staff
     if (currentMedicalStaff && currentMedicalStaff.length > 0) {
       const existingStaff = currentMedicalStaff.find(
-        (s) => s.staffId === formData.staffId
+        (s) => s.hospitalStaffId === formData.hospitalStaffId
       );
       if (existingStaff) {
         setFormError("This staff member is already assigned to this event");
@@ -102,7 +102,7 @@ function AddEventMedicalStaffDialog({
 
     // Submit with clean data
     const cleanData = {
-      staffId: formData.staffId,
+      hospitalStaffId: formData.hospitalStaffId,
       assignmentRole: formData.assignmentRole.trim(),
       notes: formData.notes.trim(),
     };
@@ -112,7 +112,7 @@ function AddEventMedicalStaffDialog({
 
   const handleClose = () => {
     setFormData({
-      staffId: "",
+      hospitalStaffId: "",
       assignmentRole: "",
       notes: "",
     });
@@ -164,7 +164,7 @@ function AddEventMedicalStaffDialog({
                   option.staffRole === "doctor" ? "Dokter" : "Perawat"
                 })`
               }
-              onChange={handleChange("staffId")}
+              onChange={handleChange("hospitalStaffId")}
               disabled={loading}
               renderInput={(params) => (
                 <TextField

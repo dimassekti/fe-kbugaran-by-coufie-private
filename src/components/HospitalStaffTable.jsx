@@ -19,7 +19,7 @@ function HospitalStaffTable({ staff, onEdit, onDelete }) {
       <Box sx={{ mt: 3 }}>
         <Typography
           variant="h6"
-          sx={{ mb: 2 }}>
+          sx={{ mb: 2, color: "text.primary", fontWeight: 600 }}>
           Staff Rumah Sakit
         </Typography>
         <Typography
@@ -32,68 +32,111 @@ function HospitalStaffTable({ staff, onEdit, onDelete }) {
     );
   }
 
+  const formatExperience = (years) => {
+    if (!years || years === 0) return "Tidak ditentukan";
+    return `${years} tahun`;
+  };
+
+  const formatLicenseNumber = (license) => {
+    if (!license) return "Tidak ditentukan";
+    return license;
+  };
+
+  const formatJoinDate = (date) => {
+    if (!date) return "Tidak ditentukan";
+    return new Date(date).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <Box sx={{ mt: 3 }}>
       <Typography
         variant="h6"
-        sx={{ mb: 2 }}>
+        sx={{ mb: 2, color: "text.primary", fontWeight: 600 }}>
         Staff Rumah Sakit ({staff.length})
       </Typography>
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        sx={{ boxShadow: 2 }}>
         <Table
-          sx={{ minWidth: 650 }}
+          sx={{
+            minWidth: 650,
+            "& .MuiTableHead-root": {
+              backgroundColor: "#f5f5f5",
+            },
+            "& .MuiTableCell-head": {
+              fontWeight: 600,
+              color: "text.primary",
+            },
+            "& .MuiTableCell-body": {
+              color: "text.primary",
+            },
+          }}
           aria-label="hospital staff table">
           <TableHead>
             <TableRow>
-              <TableCell>No</TableCell>
-              <TableCell>Nama</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Spesialisasi</TableCell>
-              <TableCell>No. Lisensi</TableCell>
-              <TableCell>Pengalaman (Tahun)</TableCell>
-              <TableCell>Tanggal Bergabung</TableCell>
-              <TableCell>Aksi</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>No</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Nama</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Spesialisasi</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>No. Lisensi</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Pengalaman</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Tanggal Bergabung</TableCell>
+              <TableCell sx={{ fontWeight: 600 }}>Aksi</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {staff.map((staffMember, index) => (
               <TableRow
                 key={staffMember.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                sx={{
+                  "&:last-child td, &:last-child th": { border: 0 },
+                  "&:hover": { backgroundColor: "#f9f9f9" },
+                }}>
                 <TableCell
                   component="th"
-                  scope="row">
+                  scope="row"
+                  sx={{ fontWeight: 500 }}>
                   {index + 1}
                 </TableCell>
-                <TableCell>
-                  {staffMember.username || staffMember.user?.username || "-"}
+                <TableCell sx={{ fontWeight: 500, color: "text.primary" }}>
+                  {staffMember.username ||
+                    staffMember.user?.username ||
+                    "Tidak diketahui"}
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ color: "text.primary" }}>
                   {staffMember.staffRole === "doctor" ? "Dokter" : "Perawat"}
                 </TableCell>
-                <TableCell>{staffMember.specialization || "-"}</TableCell>
-                <TableCell>{staffMember.licenseNumber || "-"}</TableCell>
-                <TableCell>{staffMember.yearsOfExperience || "-"}</TableCell>
-                <TableCell>
-                  {staffMember.assignedAt
-                    ? new Date(staffMember.assignedAt).toLocaleDateString(
-                        "id-ID"
-                      )
-                    : "-"}
+                <TableCell sx={{ color: "text.primary" }}>
+                  {staffMember.specialization || "Tidak ditentukan"}
+                </TableCell>
+                <TableCell sx={{ color: "text.primary" }}>
+                  {formatLicenseNumber(staffMember.licenseNumber)}
+                </TableCell>
+                <TableCell sx={{ color: "text.primary" }}>
+                  {formatExperience(staffMember.yearsOfExperience)}
+                </TableCell>
+                <TableCell sx={{ color: "text.primary" }}>
+                  {formatJoinDate(staffMember.assignedAt)}
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", gap: 1 }}>
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={() => onEdit && onEdit(staffMember.id)}>
+                      onClick={() => onEdit && onEdit(staffMember.id)}
+                      sx={{ minWidth: "60px" }}>
                       Edit
                     </Button>
                     <Button
                       variant="outlined"
                       color="error"
                       size="small"
-                      onClick={() => onDelete && onDelete(staffMember.id)}>
+                      onClick={() => onDelete && onDelete(staffMember.id)}
+                      sx={{ minWidth: "60px" }}>
                       Hapus
                     </Button>
                   </Box>

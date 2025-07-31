@@ -30,8 +30,8 @@ const EventPreviewSection = () => {
         if (response.error) {
           setError("Failed to load events");
         } else {
-          // Get first 3 events
-          setEvents((response.data.events || []).slice(0, 3));
+          // Get first 3 events - data is now directly the events array
+          setEvents((response.data || []).slice(0, 3));
         }
       } catch (err) {
         setError("Failed to load events");
@@ -44,15 +44,14 @@ const EventPreviewSection = () => {
   }, []);
 
   const formatDate = (dateString) => {
-    try {
-      return new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    } catch {
-      return "Date TBA";
-    }
+    if (!dateString) return "Date TBA";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Date TBA";
+    return date.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   };
 
   if (loading) {
@@ -160,7 +159,7 @@ const EventPreviewSection = () => {
                       variant="body2"
                       color="text.secondary"
                       sx={{ mb: 1 }}>
-                      📅 {formatDate(event.eventDate)}
+                      📅 {formatDate(event.date)}
                     </Typography>
                     <Typography
                       variant="body2"

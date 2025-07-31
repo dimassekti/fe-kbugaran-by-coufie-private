@@ -9,6 +9,10 @@ import {
   Box,
   CircularProgress,
   Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { getHospitalById, updateHospital } from "../utils/api";
 import ErrorAlert from "../components/ErrorAlert";
@@ -19,8 +23,11 @@ function EditHospitalPage() {
 
   const [formData, setFormData] = useState({
     name: "",
+    type: "",
     address: "",
     phone: "",
+    email: "",
+    description: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -51,8 +58,11 @@ function EditHospitalPage() {
         if (result.data) {
           setFormData({
             name: result.data.name || "",
+            type: result.data.type || "",
             address: result.data.address || "",
             phone: result.data.phone || "",
+            email: result.data.email || "",
+            description: result.data.description || "",
           });
         }
       } catch (error) {
@@ -79,6 +89,9 @@ function EditHospitalPage() {
     if (formData.name.length > 255) {
       return "Hospital name must not exceed 255 characters";
     }
+    if (!formData.type?.trim()) {
+      return "Hospital type is required";
+    }
     if (!formData.address?.trim()) {
       return "Hospital address is required";
     }
@@ -93,6 +106,9 @@ function EditHospitalPage() {
     }
     if (formData.phone.length < 8 || formData.phone.length > 20) {
       return "Phone number must be between 8 and 20 characters";
+    }
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return "Please enter a valid email address";
     }
     return null;
   };
@@ -132,8 +148,11 @@ function EditHospitalPage() {
 
       const result = await updateHospital(id, {
         name: formData.name.trim(),
+        type: formData.type.trim(),
         address: formData.address.trim(),
         phone: formData.phone.trim(),
+        email: formData.email.trim(),
+        description: formData.description.trim(),
       });
 
       if (result.error) {
@@ -231,6 +250,26 @@ function EditHospitalPage() {
             <Grid
               item
               xs={12}>
+              <FormControl
+                fullWidth
+                required
+                variant="outlined"
+                disabled={submitting}>
+                <InputLabel>Hospital Type</InputLabel>
+                <Select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  label="Hospital Type">
+                  <MenuItem value="hospital">Hospital</MenuItem>
+                  <MenuItem value="clinic">Clinic</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid
+              item
+              xs={12}>
               <TextField
                 name="address"
                 label="Address"
@@ -260,6 +299,39 @@ function EditHospitalPage() {
                 variant="outlined"
                 inputProps={{ maxLength: 20 }}
                 helperText="Numbers, +, -, spaces, and parentheses only (8-20 characters)"
+                disabled={submitting}
+              />
+            </Grid>
+
+            <Grid
+              item
+              xs={12}>
+              <TextField
+                name="email"
+                label="Email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                fullWidth
+                variant="outlined"
+                helperText="Optional - Enter a valid email address"
+                disabled={submitting}
+              />
+            </Grid>
+
+            <Grid
+              item
+              xs={12}>
+              <TextField
+                name="description"
+                label="Description"
+                value={formData.description}
+                onChange={handleChange}
+                fullWidth
+                multiline
+                rows={4}
+                variant="outlined"
+                helperText="Optional - Additional information about the hospital"
                 disabled={submitting}
               />
             </Grid>

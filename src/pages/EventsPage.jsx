@@ -2,9 +2,33 @@ import React from "react";
 import EventList from "../components/EventList";
 import { getEvents, deleteEvent } from "../utils/api";
 // For testing with local data: import { getAllEvents, deleteEvent, getEventsByCategory } from "../utils/local-data-archive";
-import Fab from "@mui/material/Fab";
+import {
+  Fab,
+  Container,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+  CircularProgress,
+  Paper,
+  Tabs,
+  Tab,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
+
+const TabPanel = ({ children, value, index, ...other }) => (
+  <div
+    role="tabpanel"
+    hidden={value !== index}
+    id={`event-tabpanel-${index}`}
+    aria-labelledby={`event-tab-${index}`}
+    {...other}>
+    {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+  </div>
+);
 
 class EventsPage extends React.Component {
   constructor(props) {
@@ -14,6 +38,7 @@ class EventsPage extends React.Component {
       category: "",
       isLoading: true,
       error: null,
+      tabValue: 0,
     };
   }
 
@@ -35,7 +60,7 @@ class EventsPage extends React.Component {
         return;
       }
 
-      let events = result.data.events || [];
+      let events = result.data || [];
 
       // Filter by category if selected
       if (this.state.category) {
@@ -83,64 +108,96 @@ class EventsPage extends React.Component {
   };
 
   render() {
-    const { events, category, isLoading, error } = this.state;
-
-    if (isLoading) {
-      return (
-        <section className="events-page">
-          <h2>Daftar Event</h2>
-          <p>Memuat event...</p>
-        </section>
-      );
-    }
-
-    if (error) {
-      return (
-        <section className="events-page">
-          <h2>Daftar Event</h2>
-          <div
-            className="error-message"
-            style={{ color: "red", marginBottom: "1rem" }}>
-            {error}
-          </div>
-          <button onClick={this.loadEvents}>Coba Lagi</button>
-        </section>
-      );
-    }
+    const { events, category, isLoading, error, tabValue } = this.state;
 
     return (
-      <section className="events-page">
-        <h2>Daftar Event</h2>
-        <div style={{ marginBottom: 16 }}>
-          <label htmlFor="category">Filter Kategori: </label>
-          <select
-            id="category"
-            value={category}
-            onChange={this.handleCategoryChange}>
-            <option value="">Semua</option>
-            <option value="Seminar">Seminar</option>
-            <option value="Workshop">Workshop</option>
-            <option value="Kompetisi">Kompetisi</option>
-            <option value="Konferensi">Konferensi</option>
-            <option value="Pelatihan">Pelatihan</option>
-            <option value="Webinar">Webinar</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
-        <EventList
-          events={events}
-          onDelete={this.handleDelete}
-          onEdit={this.handleEdit}
-        />
-        <Fab
-          color="primary"
-          aria-label="add"
-          sx={{ position: "fixed", bottom: 32, right: 32 }}
-          onClick={() => this.props.navigate("/events/add")}>
-          {" "}
-          <AddIcon />{" "}
-        </Fab>
-      </section>
+      <Container
+        maxWidth="lg"
+        sx={{ py: 4 }}>
+        <Paper
+          elevation={2}
+          sx={{ overflow: "hidden" }}>
+          <Box sx={{ p: 4, borderBottom: 1, borderColor: "divider" }}>
+            <Typography
+              variant="h3"
+              component="h1"
+              gutterBottom
+              color="primary"
+              fontWeight="600">
+              Daftar Event
+            </Typography>
+          </Box>
+
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={tabValue}
+              onChange={(e, newValue) => this.setState({ tabValue: newValue })}
+              aria-label="event management tabs">
+              <Tab label="Daftar Event" />
+              <Tab label="Tambah Event" />
+            </Tabs>
+          </Box>
+
+          {/* Tab 0: Event List */}
+          <TabPanel
+            value={tabValue}
+            index={0}>
+            <Box sx={{ mb: 3, maxWidth: 300 }}>
+              <FormControl fullWidth>
+                <InputLabel id="category-filter-label">
+                  Filter Kategori
+                </InputLabel>
+                <Select
+                  labelId="category-filter-label"
+                  id="category-filter"
+                  value={category}
+                  label="Filter Kategori"
+                  onChange={this.handleCategoryChange}>
+                  <MenuItem value="">Semua</MenuItem>
+                  <MenuItem value="Seminar">Seminar</MenuItem>
+                  <MenuItem value="Workshop">Workshop</MenuItem>
+                  <MenuItem value="Kompetisi">Kompetisi</MenuItem>
+                  <MenuItem value="Konferensi">Konferensi</MenuItem>
+                  <MenuItem value="Pelatihan">Pelatihan</MenuItem>
+                  <MenuItem value="Webinar">Webinar</MenuItem>
+                  <MenuItem value="Lainnya">Lainnya</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+            <EventList
+              events={events}
+              onDelete={this.handleDelete}
+              onEdit={this.handleEdit}
+            />
+          </TabPanel>
+
+          {/* Tab 1: Add Event */}
+          <TabPanel
+            value={tabValue}
+            index={1}>
+            <Box sx={{ py: 4, textAlign: "center" }}>
+              <Typography
+                variant="h5"
+                color="primary"
+                sx={{ mb: 2 }}>
+                Tambah Event Baru
+              </Typography>
+              <Fab
+                color="primary"
+                aria-label="add"
+                sx={{ mt: 2 }}
+                onClick={() => this.props.navigate("/events/add")}>
+                <AddIcon />
+              </Fab>
+              <Typography
+                variant="body2"
+                sx={{ mt: 2 }}>
+                Klik tombol di atas untuk menambah event baru.
+              </Typography>
+            </Box>
+          </TabPanel>
+        </Paper>
+      </Container>
     );
   }
 }

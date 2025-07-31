@@ -21,27 +21,27 @@ const BenefitsSection = () => {
   const benefits = [
     {
       icon: <EventIcon />,
-      title: "Easy Event Management",
+      title: "Manajemen Mudah",
       description:
-        "Create and manage events with our intuitive interface. From planning to execution, we've got you covered with powerful tools and features.",
+        "Buat dan kelola acara dengan antarmuka yang intuitif. Mulai dari perencanaan hingga pelaksanaan, semua dapat dilakukan dengan mudah berkat fitur dan alat yang canggih.",
     },
     {
       icon: <SecurityIcon />,
-      title: "Secure Registration",
+      title: "Pendaftaran Mudah",
       description:
-        "Protect your attendees' data with enterprise-grade security. All registrations and payments are processed through secure, encrypted channels.",
+        "Nikmati proses pendaftaran yang cepat dan antarmuka yang mulus. Dirancang dengan tampilan yang ramah pengguna untuk pengalaman yang nyaman dan efisien.",
     },
     {
       icon: <SpeedIcon />,
-      title: "Real-time Analytics",
+      title: "Analitik Waktu Nyata",
       description:
-        "Track event performance with comprehensive analytics. Monitor registrations, engagement, and attendance in real-time dashboards.",
+        "Pantau kinerja acara dengan analitik yang lengkap. Lacak pendaftaran, interaksi, dan kehadiran secara langsung melalui dasbor real-time.",
     },
     {
       icon: <PeopleIcon />,
-      title: "Mobile Friendly",
+      title: "Anything Anywhere",
       description:
-        "Access your events anywhere, anytime. Our responsive design ensures a seamless experience across all devices and platforms.",
+        "Akses acara Anda kapan saja dan di mana saja. Desain responsif kami menjamin pengalaman yang mulus di semua perangkat dan platform.",
     },
   ];
 
@@ -75,17 +75,29 @@ const BenefitsSection = () => {
 
         <Grid
           container
-          spacing={4}>
+          spacing={4}
+          sx={{ justifyContent: "center" }}>
           {benefits.map((benefit, index) => (
             <Grid
               item
               xs={12}
               sm={6}
-              md={3}
-              key={index}>
+              md={6}
+              lg={3}
+              key={index}
+              sx={{
+                display: "flex",
+                maxWidth: { xs: "100%", sm: "50%", md: "50%", lg: "25%" },
+              }}>
               <Card
                 sx={{
                   height: "100%",
+                  minHeight: "350px",
+                  width: "100%",
+                  maxWidth: "280px",
+                  mx: "auto",
+                  display: "flex",
+                  flexDirection: "column",
                   textAlign: "center",
                   p: 3,
                   transition: "all 0.3s ease",
@@ -94,7 +106,13 @@ const BenefitsSection = () => {
                     boxShadow: theme.shadows[8],
                   },
                 }}>
-                <CardContent>
+                <CardContent
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}>
                   <Box
                     sx={{
                       display: "flex",
@@ -111,21 +129,39 @@ const BenefitsSection = () => {
                     }}>
                     {benefit.icon}
                   </Box>
-                  <Typography
-                    variant="h5"
+                  <Box
                     sx={{
-                      fontWeight: 600,
-                      mb: 2,
-                      color: theme.palette.text.primary,
+                      flexGrow: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
                     }}>
-                    {benefit.title}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    color="text.secondary"
-                    sx={{ lineHeight: 1.6 }}>
-                    {benefit.description}
-                  </Typography>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: 600,
+                        mb: 2,
+                        color: theme.palette.text.primary,
+                        minHeight: "3rem",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}>
+                      {benefit.title}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{
+                        lineHeight: 1.6,
+                        minHeight: "120px",
+                        display: "flex",
+                        alignItems: "center",
+                        textAlign: "center",
+                      }}>
+                      {benefit.description}
+                    </Typography>
+                  </Box>
                 </CardContent>
               </Card>
             </Grid>

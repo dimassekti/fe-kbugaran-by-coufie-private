@@ -12,6 +12,12 @@ function ParticipantTable({ participants, emptyMessage }) {
   const participantsWithNumbers = participants.map((participant, index) => ({
     ...participant,
     number: index + 1,
+    // Determine checkup status based on participant checkup data
+    checkupStatus:
+      participant.participantCheckups &&
+      participant.participantCheckups.length > 0
+        ? "completed"
+        : "pending",
   }));
 
   const columns = [
@@ -28,6 +34,23 @@ function ParticipantTable({ participants, emptyMessage }) {
       },
     },
     { field: "status", headerName: "Status", flex: 1 },
+    {
+      field: "checkupStatus",
+      headerName: "Status Checkup",
+      flex: 1,
+      renderCell: (params) => {
+        const hasCheckup = params.row.checkupStatus === "completed";
+        return (
+          <span
+            style={{
+              color: hasCheckup ? "#4caf50" : "#f44336",
+              fontWeight: 600,
+            }}>
+            {hasCheckup ? "Selesai" : "Belum"}
+          </span>
+        );
+      },
+    },
     {
       field: "actions",
       headerName: "Aksi",

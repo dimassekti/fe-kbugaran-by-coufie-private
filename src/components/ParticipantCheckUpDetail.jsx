@@ -32,11 +32,19 @@ function ParticipantCheckUpDetail({
   // Show no data message if no medical data exists at all
   if (!medicalData && noDataMessage) {
     return (
-      <Card sx={{ maxWidth: 600, mx: "auto", mt: 3 }}>
+      <Card
+        sx={{
+          maxWidth: 600,
+          mx: "auto",
+          mt: 3,
+          boxShadow: 2,
+          backgroundColor: "background.paper",
+        }}>
         <CardContent>
           <Typography
             variant="body1"
-            sx={{ textAlign: "center", py: 2 }}>
+            color="text.primary"
+            sx={{ textAlign: "center", py: 2, fontWeight: 500 }}>
             {noDataMessage}
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -56,11 +64,19 @@ function ParticipantCheckUpDetail({
   // If we have medical data but no checkUpDetails, show a different message
   if (medicalData && !checkUpDetails) {
     return (
-      <Card sx={{ maxWidth: 600, mx: "auto", mt: 3 }}>
+      <Card
+        sx={{
+          maxWidth: 600,
+          mx: "auto",
+          mt: 3,
+          boxShadow: 2,
+          backgroundColor: "background.paper",
+        }}>
         <CardContent>
           <Typography
             variant="body1"
-            sx={{ textAlign: "center", py: 2 }}>
+            color="text.primary"
+            sx={{ textAlign: "center", py: 2, fontWeight: 500 }}>
             Data checkup tersedia tapi tidak ada detail yang dapat ditampilkan.
           </Typography>
           <Box
@@ -84,44 +100,84 @@ function ParticipantCheckUpDetail({
   }
 
   // Original fallback
-  if (!checkUpDetails) return <div>Belum ada data check-up.</div>;
+  if (!checkUpDetails)
+    return (
+      <Typography
+        color="text.primary"
+        sx={{ textAlign: "center", py: 2 }}>
+        Belum ada data check-up.
+      </Typography>
+    );
+
   return (
-    <Card sx={{ maxWidth: 600, mx: "auto", mt: 3 }}>
+    <Card
+      sx={{
+        maxWidth: 600,
+        mx: "auto",
+        mt: 3,
+        boxShadow: 2,
+        backgroundColor: "background.paper",
+      }}>
       <CardContent>
         <Typography
           variant="h6"
-          sx={{ mb: 2 }}>
+          color="text.primary"
+          sx={{ mb: 2, fontWeight: 600 }}>
           Check-up Terbaru
         </Typography>
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          sx={{ mb: 1, fontWeight: 500 }}>
           Tanggal:{" "}
           {formatDate(
             checkUpDetails.checkup_date || checkUpDetails.checkUpDate
           )}
         </Typography>
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          sx={{ mb: 1, fontWeight: 500 }}>
           Diperiksa oleh:{" "}
           {checkUpDetails.checked_by || checkUpDetails.doctorName || "-"}
         </Typography>
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          sx={{ mb: 1, fontWeight: 500 }}>
           Tekanan Darah: {checkUpDetails.blood_pressure_systolic || "-"}/
           {checkUpDetails.blood_pressure_diastolic || "-"} mmHg
         </Typography>
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          sx={{ mb: 1, fontWeight: 500 }}>
           Detak Jantung:{" "}
           {checkUpDetails.heart_rate || checkUpDetails.heartRate || "-"} bpm
         </Typography>
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          sx={{ mb: 1, fontWeight: 500 }}>
           Berat Badan: {checkUpDetails.weight || "-"} kg
         </Typography>
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          sx={{ mb: 1, fontWeight: 500 }}>
           Tinggi Badan: {checkUpDetails.height || "-"} cm
         </Typography>
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          sx={{ mb: 1, fontWeight: 500 }}>
           Kondisi Medis:{" "}
           {checkUpDetails.medical_conditions || checkUpDetails.allergies || "-"}
         </Typography>
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          color="text.primary"
+          sx={{ mb: 1, fontWeight: 500 }}>
           Obat-obatan: {checkUpDetails.medications || "-"}
         </Typography>
         <Typography variant="body2">

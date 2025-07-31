@@ -35,7 +35,13 @@ function EventDetail({
 
   if (!event) {
     return (
-      <Card sx={{ maxWidth: 600, mx: "auto", mt: 3 }}>
+      <Card
+        sx={{
+          width: "100%",
+          maxWidth: { xs: "100%", sm: "100%", md: "100%" },
+          mx: "auto",
+          mt: 3,
+        }}>
         <CardContent>
           <Alert
             severity="error"
@@ -53,7 +59,14 @@ function EventDetail({
   }
 
   return (
-    <Card sx={{ maxWidth: 600, mx: "auto", mt: 3 }}>
+    <Card
+      sx={{
+        width: "100%",
+        maxWidth: { xs: "100%", sm: "100%", md: "100%" },
+        mx: "auto",
+        mt: 3,
+        boxShadow: 2,
+      }}>
       <CardContent>
         {error && (
           <Alert
@@ -102,40 +115,76 @@ function EventDetail({
         <Stack
           direction="row"
           spacing={2}
-          sx={{ mt: 3 }}>
+          sx={{
+            mt: 3,
+            flexWrap: "wrap",
+            gap: 1,
+            "& .MuiButton-root": {
+              minWidth: "120px",
+              minHeight: "36px",
+              fontSize: "0.875rem",
+              fontWeight: 500,
+              borderRadius: "6px",
+              textTransform: "none",
+              px: 2,
+              py: 1,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
+              "&:hover": {
+                transform: "translateY(-1px)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+              },
+            },
+          }}>
           <Button
             variant="contained"
-            onClick={onEdit}>
-            Edit
+            onClick={onEdit}
+            sx={{
+              backgroundColor: "#1976d2",
+              "&:hover": { backgroundColor: "#1565c0" },
+            }}>
+            EDIT
           </Button>
           <Button
             variant="contained"
             color="error"
-            onClick={onDelete}>
-            Hapus
+            onClick={onDelete}
+            sx={{
+              "&:hover": { backgroundColor: "#c62828" },
+            }}>
+            HAPUS
           </Button>
           <Button
             variant="contained"
             color="success"
-            onClick={onAddParticipant}>
-            Tambah Peserta
+            onClick={onAddParticipant}
+            sx={{
+              "&:hover": { backgroundColor: "#2e7d32" },
+            }}>
+            TAMBAH PESERTA
           </Button>
           <Button
             variant="contained"
             color="info"
-            onClick={onAddMedicalStaff}>
-            Tambah Medical Staff
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => navigate(`/events/${event.id}/participants`)}>
-            View Participants
+            onClick={onAddMedicalStaff}
+            sx={{
+              "&:hover": { backgroundColor: "#0277bd" },
+            }}>
+            TAMBAH MEDICAL STAFF
           </Button>
           <Button
             variant="outlined"
-            onClick={onBack}>
-            Kembali
+            onClick={onBack}
+            sx={{
+              borderColor: "#1976d2",
+              color: "#1976d2",
+              borderWidth: "2px",
+              "&:hover": {
+                borderColor: "#1565c0",
+                backgroundColor: "#f5f5f5",
+                borderWidth: "2px",
+              },
+            }}>
+            KEMBALI
           </Button>
         </Stack>
       </CardContent>

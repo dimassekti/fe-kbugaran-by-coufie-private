@@ -12,41 +12,45 @@ const HeroCarousel = () => {
     {
       id: 1,
       image: "https://picsum.photos/1200/600?random=1",
-      title: "Manage Your Events Effortlessly",
+      title: "Manajemen Acara yang Mudah",
       subtitle:
-        "Create, organize, and track your events with our powerful platform",
+        "Buat dan kelola acara dengan antarmuka yang intuitif. Mulai dari perencanaan hingga pelaksanaan, semua dapat dilakukan dengan mudah berkat fitur dan alat yang canggih.",
       buttonText: "Get Started",
       action: () => navigate("/events"),
     },
     {
       id: 2,
       image: "https://picsum.photos/1200/600?random=2",
-      title: "Connect with Your Community",
+      title: "Pendaftaran Mudah",
       subtitle:
-        "Bring people together through meaningful events and experiences",
+        "Nikmati proses pendaftaran yang cepat dan antarmuka yang mulus. Dirancang dengan tampilan yang ramah pengguna untuk pengalaman yang nyaman dan efisien.",
       buttonText: "Explore Events",
       action: () => navigate("/events"),
     },
     {
       id: 3,
       image: "https://picsum.photos/1200/600?random=3",
-      title: "Streamline Registration",
-      subtitle: "Simple and secure event registration for attendees",
+      title: "Analitik Waktu Nyata",
+      subtitle:
+        "Pantau kinerja acara dengan analitik yang lengkap. Lacak pendaftaran, interaksi, dan kehadiran secara langsung melalui dasbor real-time.",
       buttonText: "Learn More",
       action: () => navigate("/events"),
     },
     {
       id: 4,
       image: "https://picsum.photos/1200/600?random=4",
-      title: "Real-time Analytics",
-      subtitle: "Track event performance and attendee engagement",
+      title: "Ramah untuk Perangkat Mobile",
+      subtitle:
+        "Akses acara Anda kapan saja dan di mana saja. Desain responsif kami menjamin pengalaman yang mulus di semua perangkat dan platform.",
       buttonText: "View Features",
       action: () => navigate("/events"),
     },
   ];
 
   return (
-    <Box sx={{ position: "relative", width: "100%", mb: 6 }}>
+    <Box
+      sx={{ position: "relative", width: "100%", mb: 6 }}
+      className="hero-carousel">
       <Carousel
         autoPlay={true}
         animation="slide"
@@ -96,7 +100,8 @@ const HeroCarousel = () => {
                 color: "white",
                 maxWidth: "800px",
                 px: 3,
-              }}>
+              }}
+              className="carousel-content">
               <Typography
                 variant="h1"
                 sx={{
