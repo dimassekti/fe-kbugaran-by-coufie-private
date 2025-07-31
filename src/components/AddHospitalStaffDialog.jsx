@@ -208,33 +208,36 @@ function AddHospitalStaffDialog({
             {/* Specialization */}
             <TextField
               fullWidth
-              label="Spesialisasi"
+              label="Spesialisasi (Opsional)"
               value={formData.specialization}
               onChange={handleChange("specialization")}
               disabled={loading}
-              placeholder="Contoh: Kardiologi, Pediatri, dll"
+              placeholder="Contoh: Kardiologi, Pediatri (Kosongkan jika tidak ada)"
+              helperText="Kosongkan jika tidak memiliki spesialisasi khusus"
             />
 
             {/* License Number */}
             <TextField
               fullWidth
-              label="Nomor Lisensi"
+              label="Nomor Lisensi (Opsional)"
               value={formData.licenseNumber}
               onChange={handleChange("licenseNumber")}
               disabled={loading}
-              placeholder="Nomor lisensi praktik"
+              placeholder="Nomor lisensi praktik (Kosongkan jika tidak ada)"
+              helperText="Kosongkan jika belum memiliki lisensi"
             />
 
             {/* Years of Experience */}
             <TextField
               fullWidth
-              label="Pengalaman (Tahun)"
+              label="Pengalaman (Tahun) - Opsional"
               type="number"
               value={formData.yearsOfExperience}
               onChange={handleChange("yearsOfExperience")}
               disabled={loading}
               inputProps={{ min: 0 }}
-              placeholder="Jumlah tahun pengalaman"
+              placeholder="Jumlah tahun pengalaman (Kosongkan jika baru)"
+              helperText="Masukkan 0 atau kosongkan jika baru memulai"
             />
           </Box>
         </DialogContent>

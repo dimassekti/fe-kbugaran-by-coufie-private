@@ -14,6 +14,9 @@ import {
 } from "@mui/material";
 
 function HospitalStaffTable({ staff, onEdit, onDelete }) {
+  // Debug: log staff data structure
+  console.log("Hospital Staff Data:", staff);
+
   if (!staff || staff.length === 0) {
     return (
       <Box sx={{ mt: 3 }}>
@@ -33,22 +36,31 @@ function HospitalStaffTable({ staff, onEdit, onDelete }) {
   }
 
   const formatExperience = (years) => {
-    if (!years || years === 0) return "Tidak ditentukan";
-    return `${years} tahun`;
+    if (!years || years === 0 || years === "" || years === "0")
+      return "Tidak ditentukan";
+    if (typeof years === "string" && isNaN(parseInt(years)))
+      return "Tidak ditentukan";
+    const numYears = parseInt(years);
+    if (numYears <= 0) return "Tidak ditentukan";
+    return `${numYears} tahun`;
   };
 
   const formatLicenseNumber = (license) => {
-    if (!license) return "Tidak ditentukan";
+    if (!license || license.trim() === "") return "Tidak ditentukan";
     return license;
   };
 
   const formatJoinDate = (date) => {
     if (!date) return "Tidak ditentukan";
-    return new Date(date).toLocaleDateString("id-ID", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    try {
+      return new Date(date).toLocaleDateString("id-ID", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch (error) {
+      return "Tidak ditentukan";
+    }
   };
 
   return (
@@ -105,22 +117,40 @@ function HospitalStaffTable({ staff, onEdit, onDelete }) {
                 <TableCell sx={{ fontWeight: 500, color: "text.primary" }}>
                   {staffMember.username ||
                     staffMember.user?.username ||
+                    staffMember.fullname ||
                     "Tidak diketahui"}
                 </TableCell>
                 <TableCell sx={{ color: "text.primary" }}>
-                  {staffMember.staffRole === "doctor" ? "Dokter" : "Perawat"}
+                  {staffMember.staffRole === "doctor" ||
+                  staffMember.staff_role === "doctor"
+                    ? "Dokter"
+                    : staffMember.staffRole === "nurse" ||
+                      staffMember.staff_role === "nurse"
+                    ? "Perawat"
+                    : "Staff"}
                 </TableCell>
                 <TableCell sx={{ color: "text.primary" }}>
                   {staffMember.specialization || "Tidak ditentukan"}
                 </TableCell>
                 <TableCell sx={{ color: "text.primary" }}>
-                  {formatLicenseNumber(staffMember.licenseNumber)}
+                  {formatLicenseNumber(
+                    staffMember.licenseNumber || staffMember.license_number
+                  )}
                 </TableCell>
                 <TableCell sx={{ color: "text.primary" }}>
-                  {formatExperience(staffMember.yearsOfExperience)}
+                  {formatExperience(
+                    staffMember.yearsOfExperience ||
+                      staffMember.years_of_experience
+                  )}
                 </TableCell>
                 <TableCell sx={{ color: "text.primary" }}>
-                  {formatJoinDate(staffMember.assignedAt)}
+                  {formatJoinDate(
+                    staffMember.joinDate ||
+                      staffMember.assigned_date ||
+                      staffMember.createdAt ||
+                      staffMember.created_at ||
+                      staffMember.assignedAt
+                  )}
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: "flex", gap: 1 }}>

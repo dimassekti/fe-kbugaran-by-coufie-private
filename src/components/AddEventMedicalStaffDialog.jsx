@@ -159,11 +159,31 @@ function AddEventMedicalStaffDialog({
             {/* Staff Selection */}
             <Autocomplete
               options={availableStaff || []}
-              getOptionLabel={(option) =>
-                `${option.staffName} - ${option.hospitalName} (${
-                  option.staffRole === "doctor" ? "Dokter" : "Perawat"
-                })`
-              }
+              getOptionLabel={(option) => {
+                if (!option) return "";
+                const name =
+                  option.username ||
+                  option.fullname ||
+                  option.staffName ||
+                  option.name ||
+                  "Unnamed Staff";
+                const hospital =
+                  option.hospital_name ||
+                  option.hospitalName ||
+                  option.hospital?.name ||
+                  "Unknown Hospital";
+                const role =
+                  option.staff_role === "doctor" ||
+                  option.staffRole === "doctor"
+                    ? "Dokter"
+                    : option.staff_role === "nurse" ||
+                      option.staffRole === "nurse"
+                    ? "Perawat"
+                    : "Staff";
+                // Clean label without ID showing
+                return `${name} - ${hospital} (${role})`;
+              }}
+              getOptionSelected={(option, value) => option.id === value.id}
               onChange={handleChange("hospitalStaffId")}
               disabled={loading}
               renderInput={(params) => (
@@ -174,20 +194,45 @@ function AddEventMedicalStaffDialog({
                   required
                 />
               )}
-              renderOption={(props, option) => (
-                <li {...props}>
-                  <Box>
-                    <div>
-                      <strong>{option.staffName}</strong>
-                    </div>
-                    <div style={{ fontSize: "0.875rem", color: "gray" }}>
-                      {option.hospitalName} -{" "}
-                      {option.staffRole === "doctor" ? "Dokter" : "Perawat"}
-                      {option.specialization && ` - ${option.specialization}`}
-                    </div>
-                  </Box>
-                </li>
-              )}
+              renderOption={(props, option) => {
+                if (!option) return null;
+                const name =
+                  option.username ||
+                  option.fullname ||
+                  option.staffName ||
+                  option.name ||
+                  "Unnamed Staff";
+                const hospital =
+                  option.hospital_name ||
+                  option.hospitalName ||
+                  option.hospital?.name ||
+                  "Unknown Hospital";
+                const role =
+                  option.staff_role === "doctor" ||
+                  option.staffRole === "doctor"
+                    ? "Dokter"
+                    : option.staff_role === "nurse" ||
+                      option.staffRole === "nurse"
+                    ? "Perawat"
+                    : "Staff";
+                const specialization = option.specialization || "";
+
+                return (
+                  <li
+                    {...props}
+                    key={option.id || `staff-${Math.random()}`}>
+                    <Box>
+                      <div>
+                        <strong>{name}</strong>
+                      </div>
+                      <div style={{ fontSize: "0.875rem", color: "gray" }}>
+                        {hospital} - {role}
+                        {specialization && ` - ${specialization}`}
+                      </div>
+                    </Box>
+                  </li>
+                );
+              }}
             />
 
             {/* Assignment Role Selection */}
